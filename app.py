@@ -1,8 +1,7 @@
-from flask import Flask
-from flask_restful import Resource, Api
+from flask import Flask, request, jsonify
+from flask_restful import Resource, Api, abort
 from pymongo import MongoClient
 from bson import ObjectId
-from bson.json_util import dumps
 from dotenv import dotenv_values
 import pandas as pd
 from model.model import RideEvaluator
@@ -26,15 +25,27 @@ api = Api(app)
 
 # Build resources
 class RideScore(Resource):
-    def get(self, ride_id):
-        ride_data = database['rideData'].find({'metadata.rideRecordID': ObjectId(ride_id)})
-        df_ride_data = pd.DataFrame(ride_data)
-        ride_evaluator = RideEvaluator(df_ride_data)
-        scores = ride_evaluator.evaluate()
+    def post(self):
+        # Get data from REST request body
+        try:
+            ride_data = request.get_json()
+        except Exception as err:
+            return abort(400, message=str(err))
 
-        return scores
+        try:
+            # Parse data into dataframe
+            df_ride_data = pd.DataFrame(ride_data['rideData'])
+            df_ride_data['timestamp'] = pd.to_datetime(df_ride_data['timestamp'])
 
-api.add_resource(RideScore, '/rideScore/<string:ride_id>')
+            # Evaluate ride
+            ride_evaluator = RideEvaluator(df_ride_data)
+            scores = ride_evaluator.evaluate()
+
+            return jsonify({'rideScore': scores})
+        except Exception as err:
+            return abort(500, message=str(err))
+
+api.add_resource(RideScore, '/rideScore')
 
 # Run app
 if __name__ == '__main__':
