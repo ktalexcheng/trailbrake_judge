@@ -1,5 +1,6 @@
 from flask import Flask, request, jsonify
 from flask_restful import Resource, Api, abort
+from waitress import serve
 # from pymongo import MongoClient
 # from bson import ObjectId
 # from dotenv import dotenv_values
@@ -61,4 +62,4 @@ api.add_resource(RideScore, '/rideScore')
 
 # Run app
 if __name__ == '__main__':
-    app.run()
+    serve(app, listen='*:8080')
