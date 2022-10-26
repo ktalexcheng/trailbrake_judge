@@ -1,23 +1,23 @@
 from flask import Flask, request, jsonify
 from flask_restful import Resource, Api, abort
-from pymongo import MongoClient
-from bson import ObjectId
-from dotenv import dotenv_values
+# from pymongo import MongoClient
+# from bson import ObjectId
+# from dotenv import dotenv_values
 import pandas as pd
 from model.model import RideEvaluator
 
 # Import environment variables
-config = dotenv_values('.env')
+# config = dotenv_values('.env')
 
 # Setup database connection
-mongo_client = MongoClient(
-    config['DATABASE_URL'],
-    authMechanism='MONGODB-X509',
-    tls=True,
-    tlsCertificateKeyFile='./certificate/atlas-admin-X509-cert.pem',
-    authSource='$external'
-)
-database = mongo_client[config['DB_NAME']]
+# mongo_client = MongoClient(
+#     config['DATABASE_URL'],
+#     authMechanism='MONGODB-X509',
+#     tls=True,
+#     tlsCertificateKeyFile='./certificate/atlas-admin-X509-cert.pem',
+#     authSource='$external'
+# )
+# database = mongo_client[config['DB_NAME']]
 
 # Initialize Flask RSETful API
 app = Flask(__name__)
@@ -41,7 +41,19 @@ class RideScore(Resource):
             ride_evaluator = RideEvaluator(df_ride_data)
             scores = ride_evaluator.evaluate()
 
-            return jsonify({'rideScore': scores})
+            # Calculate other metrics: Duration, distance traveled, max acceleration
+            total_distance = ride_evaluator.total_distance()
+            total_duration = ride_evaluator.total_duration()
+            max_acceleration = ride_evaluator.max_acceleration()
+
+            return jsonify({
+                'rideMeta': {
+                    'distance': total_distance,
+                    'duration': total_duration,
+                    'maxAcceleration': max_acceleration,
+                },
+                'rideScore': scores
+            })
         except Exception as err:
             return abort(500, message=str(err))
 

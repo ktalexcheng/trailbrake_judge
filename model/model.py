@@ -58,7 +58,64 @@ class RideEvaluator:
         self.braking_score = 100
         self.cornering_score = 100
         self.ride_score = 100
-    
+
+    def _distance_between(self, start_lat, start_long, end_lat, end_long):
+        '''
+        Calculates distance between two coordinates using haversine formula
+        '''
+        import math
+
+        distance = 0
+        R = 6371000 # meters
+        phi_1 = math.radians(start_lat)
+        phi_2 = math.radians(end_lat)
+        lambda_1 = math.radians(start_long)
+        lambda_2 = math.radians(end_long)
+
+        delta_phi = phi_2 - phi_1
+        delta_lambda = lambda_2 - lambda_1
+        
+        distance = 2 * R * math.asin(
+            math.sqrt(
+                math.pow(math.sin(delta_phi / 2), 2)
+                    + math.cos(phi_1) * math.cos(phi_2) * math.pow(math.sin(delta_lambda / 2), 2)
+            )
+        )
+
+        return distance
+
+    def max_acceleration(self):
+        import numpy as np
+
+        _df = self.df_original
+
+        # Calculate absolute acceleration
+        _df['_abs_acceleration'] = np.sqrt(
+            sum([
+                _df['accelerometerX'] ** 2, 
+                _df['accelerometerY'] ** 2, 
+                _df['accelerometerZ'] ** 2
+            ])
+        )
+
+        return _df['_abs_acceleration'].max()
+
+    def total_duration(self):
+        return (self.df_original['timestamp'].max() - self.df_original['timestamp'].min()).total_seconds()
+
+    def total_distance(self):
+        _df = self.df_original
+
+        for i in range(1, len(_df)):
+            _df.loc[i, '_distance_moved'] = self._distance_between(
+                start_lat=_df.loc[i - 1, 'locationLat'],
+                start_long=_df.loc[i - 1, 'locationLong'],
+                end_lat=_df.loc[i, 'locationLat'],
+                end_long=_df.loc[i, 'locationLong'],
+            )
+
+        return _df['_distance_moved'].sum()
+
     def evaluate(self):
         self.df_processed = self.df_original.assign(
             timestamp_s=self.df_original['timestamp'].dt.floor(freq='s')
