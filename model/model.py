@@ -63,6 +63,9 @@ class RideEvaluator:
         '''
         Calculates distance between two coordinates using haversine formula
         '''
+        if not (start_lat and start_long and end_lat and end_long):
+            return 0
+
         import math
 
         distance = 0
