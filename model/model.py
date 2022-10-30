@@ -121,7 +121,7 @@ class RideEvaluator:
 
     def evaluate(self):
         self.df_processed = self.df_original.assign(
-            timestamp_s=self.df_original['timestamp'].dt.floor(freq='s')
+            timestamp_s=self.df_original['timestamp'].dt.floor(freq='3s')
         ).groupby(by=['timestamp_s'])[['accelerometerX', 'accelerometerY', 'accelerometerZ']].agg({
             'accelerometerX': ['min', 'max'],
             'accelerometerY': ['min', 'max'],
@@ -129,13 +129,13 @@ class RideEvaluator:
         })
 
         for i, row in self.df_processed.iterrows():
-            _accelX_max_G = abs(row.loc[('accelerometerX', 'max')] / self.GRAVITY)
-            # _accelY_max_G = abs(row.loc[('accelerometerY', 'max')] / self.GRAVITY)
-            _accelZ_max_G = abs(row.loc[('accelerometerZ', 'max')] / self.GRAVITY)
+            _accelX_max_G = row.loc[('accelerometerX', 'max')] / self.GRAVITY
+            # _accelY_max_G = row.loc[('accelerometerY', 'max')] / self.GRAVITY
+            _accelZ_max_G = row.loc[('accelerometerZ', 'max')] / self.GRAVITY
 
-            _accelX_min_G = abs(row.loc[('accelerometerX', 'min')] / self.GRAVITY)
-            # _accelY_min_G = abs(row.loc[('accelerometerY', 'min')] / self.GRAVITY)
-            _accelZ_min_G = abs(row.loc[('accelerometerZ', 'min')] / self.GRAVITY)
+            _accelX_min_G = row.loc[('accelerometerX', 'min')] / self.GRAVITY
+            # _accelY_min_G = row.loc[('accelerometerY', 'min')] / self.GRAVITY
+            _accelZ_min_G = row.loc[('accelerometerZ', 'min')] / self.GRAVITY
 
             _corner_G = max(abs(_accelX_min_G), abs(_accelX_max_G))
 

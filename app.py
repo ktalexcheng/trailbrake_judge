@@ -3,12 +3,13 @@ from flask_restful import Resource, Api, abort
 from waitress import serve
 # from pymongo import MongoClient
 # from bson import ObjectId
-from dotenv import dotenv_values
+# from dotenv import dotenv_values
+import os
 import pandas as pd
 from model.model import RideEvaluator
 
 # Import environment variables
-config = dotenv_values('.env')
+# config = dotenv_values('.env')
 
 # Setup database connection
 # mongo_client = MongoClient(
@@ -62,4 +63,5 @@ api.add_resource(RideScore, '/rideScore')
 
 # Run app
 if __name__ == '__main__':
-    serve(app, listen=f'*:{config["PORT"]}')
+    # os.environ['PORT'] = '5000' # FOR DEVELOPMENT ONLY
+    serve(app, listen=f'*:{os.environ.get("PORT", 8080)}')
