@@ -1,5 +1,5 @@
-# TrailBrake Judge
+# Trailbrake Judge
 
 ## Description
 
-TrailBrake Judge is microservice for evaluating rides logged with TrailBrake.
+Trailbrake Judge is microservice for evaluating rides logged with Trailbrake.

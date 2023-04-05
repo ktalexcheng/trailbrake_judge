@@ -10,6 +10,6 @@ COPY . .
 
 ENV PORT=8080
 
-EXPOSE 8080
+EXPOSE 8080 2345
 
 CMD [ "python", "app.py" ]

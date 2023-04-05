@@ -1,0 +1,133 @@
+openapi: 3.0.1
+info:
+  title: Trailbrake Judge API
+  description: Trailbrake Judge provides scoring services for ride data collected by Trailbrake.
+  version: "0.1.0"
+servers:
+  - url: https://trailbrake-judge-f6muv3fwlq-de.a.run.app
+paths:
+  /rideScore:
+    post:
+      description: Retrieve ride score of the provided ride data
+      requestBody:
+        required: true
+        content:
+          application/json; charset=utf-8:
+            schema:
+              type: object
+              properties:
+                rideData:
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/rideData"
+      responses:
+        "200":
+          description: Retrieved metadata for all available rides
+          content:
+            application/json; charset=utf-8:
+              schema:
+                type: object
+                properties:
+                  rideMeta:
+                    $ref: "#/components/schemas/rideMeta"
+                  rideScore:
+                    $ref: "#/components/schemas/rideScore"
+        "400":
+          description: "Bad request"
+        "500":
+          description: "Internal server error"
+components:
+  schemas:
+    rideData:
+      type: object
+      required:
+        - _id
+        - timestamp
+        - rideRecordId
+        - locationLat
+        - locationLong
+        - accelerometerX
+        - accelerometerY
+        - accelerometerZ
+        - gyroscopeX
+        - gyroscopeY
+        - gyroscopeZ
+      properties:
+        _id:
+          type: string
+          example: 6333136ab4f80427841d4dd2
+        timestamp:
+          type: string
+          format: date-time
+          example: 2000-01-01T00:00:00.000+00:00
+        rideRecordId:
+          type: string
+          example: 507f1f77bcf86cd799439011
+        locationLat:
+          type: number
+          example: 12.123
+        locationLong:
+          type: number
+          example: 12.123
+        accelerometerX:
+          type: number
+          example: 12.123
+        accelerometerY:
+          type: number
+          example: 12.123
+        accelerometerZ:
+          type: number
+          example: 12.123
+        gyroscopeX:
+          type: number
+          example: 12.123
+        gyroscopeY:
+          type: number
+          example: 12.123
+        gyroscopeZ:
+          type: number
+          example: 12.123
+    rideMeta:
+      type: object
+      required:
+        - distance
+        - duration
+        - maxAcceleration
+        - UserId
+      properties:
+        distance: 
+          type: number
+          example: 12.123
+        duration: 
+          type: number
+          example: 12.123
+        maxAcceleration: 
+          type: number
+          example: 12.123
+        userId:
+          type: string
+          example: 635e2760b5219f17c17e7f74
+    rideScore:
+      type: object
+      required:
+        - overall
+        - speed
+        - acceleration
+        - braking
+        - cornering
+      properties:
+        overall:
+          type: number
+          example: 95
+        speed:
+          type: number
+          example: 95
+        acceleration:
+          type: number
+          example: 95
+        braking:
+          type: number
+          example: 95
+        cornering:
+          type: number
+          example: 95
